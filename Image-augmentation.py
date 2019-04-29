@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[119]:
-
-
 import cv2
 import numpy as np
-get_ipython().run_line_magic('matplotlib', 'inline')
+#get_ipython().run_line_magic('matplotlib', 'inline')
 import matplotlib.pyplot as plt
 import os
 from random import randint
 import math
 
 def bgr2rgb(images):
+    # Convert array of images from bgr to rgb.
     rgb_images = []
     for image in images:
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -21,6 +19,7 @@ def bgr2rgb(images):
 
 
 def load_images_from_folder(folder):
+    # Load all images from a folder.
     images = []
     for filename in os.listdir(folder):
         img = cv2.imread(os.path.join(folder,filename))
@@ -28,19 +27,7 @@ def load_images_from_folder(folder):
             images.append(img)
     return images
 
-images = load_images_from_folder("augmented_image/Train")
-
-plt.imshow(images[1])
-
-plt.show()
-
-images_rgb = bgr2rgb(images)
-
-plt.imshow(images_rgb[1])
-
-
-# In[321]:
-
+# images = load_images_from_folder("augmented_image/Train")
 
 def augment_motion_blur(img, size):
     # Add motion blur to the image in the form of horizontal pixel averaging
@@ -61,16 +48,11 @@ def augment_motion_blur(img, size):
         output.append(blurred_img)
     return output
 
-blurred_img = augment_motion_blur(images, 5)
-plt.imshow(blurred_img[20])
-plt.show()
-plt.imshow(images[20])
-plt.show()
-
-
-
-# In[319]:
-
+# blurred_img = augment_motion_blur(images, 5)
+# plt.imshow(blurred_img[20])
+# plt.show()
+# plt.imshow(images[20])
+# plt.show()
 
 def augment_occlusion(img, width_perc):
     # Add occlusion to an image in the form of a vertical bar.
@@ -94,15 +76,10 @@ def augment_occlusion(img, width_perc):
         output.append(image)
     return output
 
-image_occ = augment_occlusion(images, 10)
-
-plt.imshow(image_occ[1])
-plt.show()
-plt.imshow(images[1])
-
-
-# In[317]:
-
+# image_occ = augment_occlusion(images, 10)
+# plt.imshow(image_occ[1])
+# plt.show()
+# plt.imshow(images[1])
 
 def augment_brightness(image,start_brightness,stop_brightness):
     # Change brightness of an image by changing the lightness in HLS format
@@ -124,11 +101,8 @@ def augment_brightness(image,start_brightness,stop_brightness):
         output.append(image1)
     return output
 
-image_ill = augment_brightness(images, 0.1, 5)
-
-plt.imshow(image_ill[20])
-
-plt.show()
-
-plt.imshow(images[20])
+# image_ill = augment_brightness(images, 0.1, 5)
+# plt.imshow(image_ill[20])
+# plt.show()
+# plt.imshow(images[20])
 
