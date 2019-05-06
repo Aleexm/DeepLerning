@@ -106,3 +106,6 @@ def augment_brightness(image,start_brightness,stop_brightness):
 # plt.show()
 # plt.imshow(images[20])
 
+
+
+images = load_images_from_folder(data)

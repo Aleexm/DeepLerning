@@ -1,0 +1,5 @@
+ M{
+  "APP_FOLDER" : "Deep-Learning-Team16",
+  "DATA_FOLDER"  : "data",
+  "NUM_CLASSES" : "42" 
+}
