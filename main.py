@@ -6,6 +6,7 @@ import inspect
 
 import torchvision.models as models
 from torchvision import transforms
+import torch.optim as optim
 
 
 import torch.nn as nn
@@ -16,6 +17,27 @@ from model_utils import set_parameter_requires_grad
 import os
 import cv2
 import copy
+
+
+from sklearn.model_selection import train_test_split
+from image_dataset import ImageDataset
+
+
+def read_data(logger):
+
+  data = []
+  labels = []
+  for i in tqdm(range(int(logger.config_dict['NUM_CLASSES']))):
+    directory = os.fsencode(os.path.join(logger.data_folder, "Train", str(i)))
+
+    for file in os.listdir(directory):
+      filename = os.fsdecode(file)
+      if filename.endswith(".png"):
+        data.append(cv2.imread(logger.get_data_file(filename, os.path.join(
+          "Train", str(i)))))
+        labels.append(i)
+
+  return data, labels
 
 
 def train_model(logger, model, dataloaders, criterion, optimizer, num_epochs):
@@ -30,6 +52,8 @@ def train_model(logger, model, dataloaders, criterion, optimizer, num_epochs):
     t.refresh()
     t.update(1)
 
+    inspect.builtins.print = old_print
+
     logger.log("Start epoch no {}".format(epoch))
 
     for phase in ['train', 'val']:
@@ -41,7 +65,7 @@ def train_model(logger, model, dataloaders, criterion, optimizer, num_epochs):
 
       epoch_loss = 0
       epoch_correctes = 0
-      for inputs, labels in dataloaders['phase']:
+      for inputs, labels in dataloaders[phase]:
         inputs_pt = inputs.to(device)
         labels_pt = labels.to(device)
 
@@ -98,20 +122,51 @@ if __name__ == '__main__':
   print(data_folder)
   logger.data_folder = data_folder
   
-
-  train_images = []
-  for i in tqdm(range(int(logger.config_dict['NUM_CLASSES']))):
-    train_directory = os.fsencode(os.path.join(logger.data_folder, "Train", str(i)))
-
-    for file in os.listdir(train_directory):
-      filename = os.fsdecode(file)
-      if filename.endswith(".png"):
-        train_images.append(cv2.imread(logger.get_data_file(filename, os.path.join(
-          "Train", str(i)))))
-
   num_classes = int(logger.config_dict['NUM_CLASSES'])
-
   model = load_vgg(logger)
 
   device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
   model.to(device)
+
+  data, labels = read_data(logger)
+
+
+  X_train, X_valid, y_train, y_valid = train_test_split(data, labels, test_size = 0.1,
+    random_state = 13)
+
+  train_dict = {'X': X_train, 'y': y_train}
+  valid_dict = {'X': X_valid, 'y': y_valid}
+
+  input_size = 32
+  
+  train_transform = transforms.Compose([
+        transforms.RandomResizedCrop(input_size),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+  valid_transform = transforms.Compose([
+        transforms.Resize(input_size),
+        transforms.CenterCrop(input_size),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+
+  train_dataset = ImageDataset(train_dict, logger, transform = train_transform)
+  valid_dataset = ImageDataset(valid_dict, logger, transform = valid_transform)
+
+
+  dataloaders = {
+    'train': 
+      torch.utils.data.DataLoader(train_dataset, batch_size = 32, shuffle = True, num_workers = 4),
+    'valid':
+      torch.utils.data.DataLoader(valid_dataset, batch_size = 32, shuffle = True, num_workers = 4)
+    }
+
+  for name,param in model.named_parameters():
+    if param.requires_grad == True:
+      logger.log("Param to optimize {}".format(name))
+
+  optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+  criterion = nn.CrossEntropyLoss()
+
+
+  trained_model, hist = train_model(logger, model, dataloaders, criterion, optimizer, num_epochs = 1)
