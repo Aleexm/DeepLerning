@@ -1,4 +1,6 @@
 from torch.utils.data.dataset import Dataset
+from PIL import Image
+import numpy as np
 
 class ImageDataset(Dataset):
 
@@ -16,10 +18,14 @@ class ImageDataset(Dataset):
 
 
   def __getitem__(self, index):
-
-    sample = {'image': self.X[index], 'label': self.y[index]}
+      
+    sample = self.X[index]
     
     if self.transform:
-      sample = self.transform(sample)
+        sample = np.array(sample) # convert to numpy array
+        sample = Image.fromarray(sample) # convert to PIL image
+        sample = self.transform(sample)
+      
+    sample = {'image': sample, 'label': self.y[index]}
 
     return sample

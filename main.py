@@ -64,8 +64,11 @@ def train_model(logger, model, dataloaders, criterion, optimizer, num_epochs):
         model.eval()
 
       epoch_loss = 0
-      epoch_correctes = 0
-      for inputs, labels in dataloaders[phase]:
+      epoch_corrects = 0
+      
+      for dataset in dataloaders[phase]: # fixed here
+        inputs = dataset["image"]
+        labels = dataset["label"]
         inputs_pt = inputs.to(device)
         labels_pt = labels.to(device)
 
@@ -153,12 +156,12 @@ if __name__ == '__main__':
   train_dataset = ImageDataset(train_dict, logger, transform = train_transform)
   valid_dataset = ImageDataset(valid_dict, logger, transform = valid_transform)
 
-
+    # took num_workers out here
   dataloaders = {
     'train': 
-      torch.utils.data.DataLoader(train_dataset, batch_size = 32, shuffle = True, num_workers = 4),
+      torch.utils.data.DataLoader(train_dataset, batch_size = 32, shuffle = True),
     'valid':
-      torch.utils.data.DataLoader(valid_dataset, batch_size = 32, shuffle = True, num_workers = 4)
+      torch.utils.data.DataLoader(valid_dataset, batch_size = 32, shuffle = True)
     }
 
   for name,param in model.named_parameters():
@@ -167,6 +170,5 @@ if __name__ == '__main__':
 
   optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
   criterion = nn.CrossEntropyLoss()
-
 
   trained_model, hist = train_model(logger, model, dataloaders, criterion, optimizer, num_epochs = 1)
