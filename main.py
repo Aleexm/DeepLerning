@@ -47,6 +47,7 @@ def train_model(logger, model, dataloaders, criterion, optimizer, num_epochs):
   t = trange(num_epochs, desc='Epoch bar', leave=True)
 
   validation_acc_list = []
+  best_acc = 0
   for epoch in range(num_epochs):
     t.set_description("Epoch no {}/{}".format(epoch, num_epochs))
     t.refresh()
@@ -56,7 +57,7 @@ def train_model(logger, model, dataloaders, criterion, optimizer, num_epochs):
 
     logger.log("Start epoch no {}".format(epoch))
 
-    for phase in ['train', 'val']:
+    for phase in ['train', 'valid']:
 
       if phase == "train":
         model.train()
@@ -93,13 +94,13 @@ def train_model(logger, model, dataloaders, criterion, optimizer, num_epochs):
       logger.log("{} loss at epoch {}: {}".format(
         "Train" if phase == "train" else "Validation", epoch, epoch_loss))
       logger.log("{} accuracy at epoch {}: {}".format(
-        "Train" if phase == "train" else "Validation", epoch, epoch_loss))
+        "Train" if phase == "train" else "Validation", epoch, epoch_acc))
 
-      if phase == "val" and epoch_acc > best_acc:
+      if phase == "valid" and epoch_acc > best_acc:
         best_acc   = epoch_acc
         best_model = copy.deepcopy(model.state_dict())
 
-      if phase == "val":
+      if phase == "valid":
         validation_acc_list.append(epoch_acc) 
 
     logger.log("Finish epoch no {}".format(epoch), show_time = True)
