@@ -160,9 +160,9 @@ if __name__ == '__main__':
     # took num_workers out here
   dataloaders = {
     'train': 
-      torch.utils.data.DataLoader(train_dataset, batch_size = 32, shuffle = True),
+      torch.utils.data.DataLoader(train_dataset, batch_size = 256, shuffle = True),
     'valid':
-      torch.utils.data.DataLoader(valid_dataset, batch_size = 32, shuffle = True)
+      torch.utils.data.DataLoader(valid_dataset, batch_size = 256, shuffle = True)
     }
 
   for name,param in model.named_parameters():
@@ -171,5 +171,7 @@ if __name__ == '__main__':
 
   optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
   criterion = nn.CrossEntropyLoss()
+
+  #print(model)
 
   trained_model, hist = train_model(logger, model, dataloaders, criterion, optimizer, num_epochs = 1)
