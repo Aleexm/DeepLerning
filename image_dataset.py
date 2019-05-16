@@ -4,12 +4,13 @@ import numpy as np
 
 class ImageDataset(Dataset):
 
-  def __init__(self, data_dict, logger, transform = None):
+  def __init__(self, data_dict, logger, transform = None, fnames = None):
 
     self.logger = logger
     self.transform = transform
     self.X = data_dict['X']
     self.y = data_dict['y']
+    self.fnames = fnames
 
 
   def __len__(self):
@@ -25,7 +26,10 @@ class ImageDataset(Dataset):
         sample = np.array(sample) # convert to numpy array
         sample = Image.fromarray(sample) # convert to PIL image
         sample = self.transform(sample)
-      
-    sample = {'image': sample, 'label': self.y[index]}
+     
+    if self.fnames is None: 
+        sample = {'image': sample, 'label': self.y[index]}
+    else:
+        sample = {'image': sample, 'label': self.y[index], 'fname': self.fnames[index]}
 
     return sample

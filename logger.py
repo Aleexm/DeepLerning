@@ -3,6 +3,8 @@ import sys
 import os
 import json
 
+from utils import get_drive_path
+
 _HTML_START = "<HEAD><meta http-equiv='refresh' content='100' ></HEAD><BODY><pre>"
 _HTML_END = "</pre></BODY>"
 
@@ -30,6 +32,10 @@ class Logger():
     print(self.get_time() + " Create logs folder {}".format(logs_folder))
     self.log_file = self.create_file()
 
+    with open(self.config_file) as fp:
+      self.config_dict = json.load(fp)
+    print(self.get_time() + " Read config file {}".format(config_file))
+
     if self.html_output:
       self.log_file.write(_HTML_START)
       self.log_file.close()
@@ -42,13 +48,14 @@ class Logger():
       os.makedirs(output_folder)
     print(self.get_time() + " Create output folder {}".format(output_folder))
 
-    if not os.path.exists(data_folder):
-      os.makedirs(data_folder)
-    print(self.get_time() + " Create data folder {}".format(data_folder))
-
-    with open(self.config_file) as fp:
-      self.config_dict = json.load(fp)
-    print(self.get_time() + " Read config file {}".format(config_file))
+    if data_folder != "drive":
+      if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+      print(self.get_time() + " Create data folder {}".format(data_folder))
+    else:
+      data_folder = os.path.join(get_drive_path(), self.config_dict['APP_FOLDER'], 
+        self.config_dict['DATA_FOLDER'])
+      self.data_folder = data_folder
 
 
   def get_time(self):
