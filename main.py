@@ -1,4 +1,3 @@
-from utils import get_drive_path
 from logger import Logger
 
 from tqdm import tqdm, trange
@@ -17,10 +16,42 @@ from model_utils import set_parameter_requires_grad
 import os
 import cv2
 import copy
+import time
 
 
 from sklearn.model_selection import train_test_split
 from image_dataset import ImageDataset
+
+import seaborn as sns
+import numpy as np
+import matplotlib.pyplot as plt 
+
+import pickle as pkl
+
+
+def plot_loss_history(plt_title, filename, training_list, validation_list, logger):
+
+  fig = plt.figure(figsize=(5, 5))
+  sns.set()
+
+  tmstp = logger.get_time_prefix()
+  with open(logger.get_output_file("train_loss_" + tmstp + ".pkl"), 'w') as fp:
+    pkl.dump(training_list, fp)
+  with open(logger.get_output_file("valid_loss_" + tmstp + ".pkl"), 'w') as fp:
+    pkl.dump(validation_list, fp)
+
+  x = np.array(range(len(training_list)))
+  plt.title(plt_title)
+  plt.plot(x, training_list, linestyle='--', marker = 'o', color='blue', label = 'Training')
+  plt.plot(x, validation_list, linestyle='-', marker = 'o', color='red', label = 'Validation')
+  plt.xlabel("Epoch")
+  plt.ylabel("Loss")
+  plt.xticks(x, range(1, len(training_list) + 1))
+
+  plt.legend(loc = 'upper right')
+
+  plt.savefig(logger.get_output_file(filename), dpi = 120, 
+    bbox_inches='tight')
 
 
 def read_data(logger):
@@ -40,22 +71,26 @@ def read_data(logger):
   return data, labels
 
 
-def train_model(logger, model, dataloaders, criterion, optimizer, num_epochs):
+def train_model(logger, model, dataloaders, criterion, optimizer, 
+  num_epochs = 1, save_after_epochs = 1):
 
   old_print = print
   inspect.builtins.print = tqdm.write
   t = trange(num_epochs, desc='Epoch bar', leave=True)
 
-  validation_acc_list = []
+  validation_acc_list  = []
+  validation_loss_list = []
+  training_loss_list   = []
   best_acc = 0
   for epoch in range(num_epochs):
+    start_time = time.time()
     t.set_description("Epoch no {}/{}".format(epoch, num_epochs))
     t.refresh()
     t.update(1)
 
     inspect.builtins.print = old_print
 
-    logger.log("Start epoch no {}".format(epoch))
+    logger.log("Start epoch no {}".format(epoch + 1))
 
     for phase in ['train', 'valid']:
 
@@ -92,18 +127,36 @@ def train_model(logger, model, dataloaders, criterion, optimizer, num_epochs):
       epoch_acc  = epoch_corrects.double() / len(dataloaders[phase].dataset)
 
       logger.log("{} loss at epoch {}: {}".format(
-        "Train" if phase == "train" else "Validation", epoch, epoch_loss))
+        "Train" if phase == "train" else "Validation", epoch + 1, epoch_loss))
       logger.log("{} accuracy at epoch {}: {}".format(
-        "Train" if phase == "train" else "Validation", epoch, epoch_acc))
+        "Train" if phase == "train" else "Validation", epoch + 1, epoch_acc))
 
       if phase == "valid" and epoch_acc > best_acc:
         best_acc   = epoch_acc
+        best_epoch = epoch
         best_model = copy.deepcopy(model.state_dict())
 
       if phase == "valid":
+        if epoch % save_after_epochs == 0:
+          logger.log("Save model at epoch {}".format(epoch + 1))
+          model_path = "VGG16_E" + str(epoch + 1) + "_L" + "{:.2f}".format(epoch_loss) + "_" + logger.get_time_prefix()
+          model_path += ".ptm"
+          torch.save(model, logger.get_model_file(model_path))
+          logger.log("Done saving model", show_time = True)
         validation_acc_list.append(epoch_acc) 
+        validation_loss_list.append(epoch_loss)
+      else:
+        training_loss_list.append(epoch_loss)
 
-    logger.log("Finish epoch no {}".format(epoch), show_time = True)
+    logger.log("Finish epoch no {} in {:.2f}s".format(epoch + 1, time.time() - start_time))
+
+  plot_loss_history("Loss during training of VGG16", "loss_plot_" + logger.get_time_prefix(), 
+    training_loss_list, validation_loss_list, logger)
+  logger.log("Save best model")
+  model_path = "VGG16_BEST" + "_E" + str(best_epoch + 1) + "_" + logger.get_time_prefix()
+  model_path += ".ptm"
+  torch.save(best_model, logger.get_model_file(model_path))
+  logger.log("Done saving model", show_time = True)
 
   return model.load_state_dict(best_model), validation_acc_list
 
@@ -120,11 +173,8 @@ def load_vgg(logger):
 
 if __name__ == '__main__':
 
-  logger = Logger(show = True, html_output = True, config_file = "config.txt")
-  data_folder = os.path.join(get_drive_path(), logger.config_dict['APP_FOLDER'], 
-    logger.config_dict['DATA_FOLDER'])
-  print(data_folder)
-  logger.data_folder = data_folder
+  logger = Logger(show = True, html_output = True, config_file = "config.txt",
+    data_folder = "drive")
   
   num_classes = int(logger.config_dict['NUM_CLASSES'])
   model = load_vgg(logger)
@@ -135,7 +185,7 @@ if __name__ == '__main__':
   data, labels = read_data(logger)
 
 
-  X_train, X_valid, y_train, y_valid = train_test_split(data, labels, test_size = 0.1,
+  X_train, X_valid, y_train, y_valid = train_test_split(data, labels, test_size = 0.15,
     random_state = 13)
 
   train_dict = {'X': X_train, 'y': y_train}
@@ -157,7 +207,6 @@ if __name__ == '__main__':
   train_dataset = ImageDataset(train_dict, logger, transform = train_transform)
   valid_dataset = ImageDataset(valid_dict, logger, transform = valid_transform)
 
-    # took num_workers out here
   dataloaders = {
     'train': 
       torch.utils.data.DataLoader(train_dataset, batch_size = 256, shuffle = True),
@@ -174,4 +223,5 @@ if __name__ == '__main__':
 
   #print(model)
 
-  trained_model, hist = train_model(logger, model, dataloaders, criterion, optimizer, num_epochs = 1)
+  trained_model, hist = train_model(logger, model, dataloaders, criterion, 
+    optimizer, num_epochs = 50, save_after_epochs = 5)
