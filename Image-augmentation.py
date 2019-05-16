@@ -176,38 +176,42 @@ def augment_brightness(image,start_brightness,stop_brightness):
     return output
 
 # EXAMPLE:
-image_ill = augment_brightness(images, 0.1, .4)
-plt.imshow(image_ill[1])
-plt.show()
-plt.imshow(images[1])
+# image_ill = augment_brightness(images, 0.1, .4)
+# plt.imshow(image_ill[1])
+# plt.show()
+# plt.imshow(images[1])
 
 # Create and save augmented images
 def create_brightness_test_set(start, end, number):
     bright_img = augment_brightness(images, start, end)
-
-    path = r"C:\Users\Stefan\Documents\Msc ME-VE\S2\Deep Learning\Final Project\gtsrb-german-traffic-sign/Test\Bright_" + str(number)
+    if end <= 1:
+      path = r"C:\Users\Stefan\Documents\Msc ME-VE\S2\Deep Learning\Final Project\gtsrb-german-traffic-sign/Test\Dark_" + str(number)
+    else:
+      path = r"C:\Users\Stefan\Documents\Msc ME-VE\S2\Deep Learning\Final Project\gtsrb-german-traffic-sign/Test\Bright_" + str(number)
 
     for it in range(len(bright_img)):
         cv2.imwrite(os.path.join(path, filenames[it]), bright_img[it])
 
-#create_brightness_test_set(.1,.4,1)
-#print('done')
-#create_brightness_test_set(.4,.7,2)
-#print('done')
-#create_brightness_test_set(.7,1,3)
-#print('done')
-#create_brightness_test_set(1,1.3,4)
-#print('done')
-#create_brightness_test_set(1.3,1.6,5)
-#print('done')
-#create_brightness_test_set(1.6,1.9,6)
-#print('done')
-#create_brightness_test_set(1.9,2.2,7)
-#print('done')
-#create_brightness_test_set(2.2,2.5,8)
-#print('done')
-#create_brightness_test_set(2.5,2.8,9)
-#print('done')
-#create_brightness_test_set(2.8,3.1,10)
-#print('done creating test set.')
+# DARKEN:
+create_brightness_test_set(.7,1,1)
+print('done')
+create_brightness_test_set(.4,.7,2)
+print('done')
+create_brightness_test_set(.1,.4,3)
+print('done')
+# BRIGHTEN:
+create_brightness_test_set(1,1.3,1)
+print('done')
+create_brightness_test_set(1.3,1.6,2)
+print('done')
+create_brightness_test_set(1.6,1.9,3)
+print('done')
+create_brightness_test_set(1.9,2.2,4)
+print('done')
+create_brightness_test_set(2.2,2.5,5)
+print('done')
+create_brightness_test_set(2.5,2.8,6)
+print('done')
+create_brightness_test_set(2.8,3.1,7)
+print('done creating test set.')
 
