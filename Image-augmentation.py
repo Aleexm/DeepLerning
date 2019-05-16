@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[7]:
+# In[]:
 
 
 import cv2
 import numpy as np
-get_ipython().run_line_magic('matplotlib', 'inline')
 import matplotlib.pyplot as plt
 import os
 from random import randint
@@ -87,7 +86,7 @@ create_blurred_test_set(10)
 create_blurred_test_set(15)
 
 
-# In[9]:
+# In[]:
 
 
 def augment_occlusion(img, width_perc):
@@ -140,7 +139,7 @@ create_occluded_test_set(25)
 print('done')
 
 
-# In[12]:
+# In[]
 
 
 def augment_brightness(image,start_brightness,stop_brightness):
@@ -152,28 +151,35 @@ def augment_brightness(image,start_brightness,stop_brightness):
     
     output = []
     for image in images:
-        #changing the color space from rgb to hsv
-        image1 = cv2.cvtColor(image,cv2.COLOR_BGR2HLS)
-        image1 = np.array(image1, dtype = np.float64)
-        random_bright = np.random.uniform(start_brightness,stop_brightness)
-        image1[...,1] = image1[...,1]*random_bright
-        image1[...,1][image1[...,1]>255]  = 255
-        image1 = np.array(image1, dtype = np.uint8)
-        #image1 = cv2.cvtColor(image1,cv2.COLOR_HLS2RGB)
-        image1 = cv2.cvtColor(image1,cv2.COLOR_HLS2BGR) # For saving test sets.
-        output.append(image1)
+       if start_brightness >= 1:
+           #changing the color space from rgb to hls
+           image1 = cv2.cvtColor(image,cv2.COLOR_BGR2HLS)
+           image1 = np.array(image1, dtype = np.float64)
+           random_bright = np.random.uniform(start_brightness,stop_brightness)
+           image1[...,1] = image1[...,1]*random_bright
+           image1[...,1][image1[...,1]>255]  = 255
+           image1 = np.array(image1, dtype = np.uint8)
+           #image1 = cv2.cvtColor(image1,cv2.COLOR_HLS2RGB)
+           image1 = cv2.cvtColor(image1,cv2.COLOR_HLS2BGR) # For saving test sets.
+           output.append(image1)
+       elif start_brightness < 1:
+           #changing the color space from rgb to hsv
+           image1 = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
+           image1 = np.array(image1, dtype = np.float64)
+           random_bright = np.random.uniform(start_brightness,stop_brightness)
+           image1[...,2] = image1[...,2]*random_bright
+           image1[...,2][image1[...,2]>255]  = 255
+           image1 = np.array(image1, dtype = np.uint8)
+           #image1 = cv2.cvtColor(image1,cv2.COLOR_HLS2RGB)
+           image1 = cv2.cvtColor(image1,cv2.COLOR_HSV2BGR) # For saving test sets.
+           output.append(image1)
     return output
 
 # EXAMPLE:
-# image_ill = augment_brightness(images, 0.1, 5)
-# plt.imshow(image_ill[20])
-# plt.show()
-# plt.imshow(images[20])
-
-
-
-
-images = load_images_from_folder(data)
+image_ill = augment_brightness(images, 0.1, .4)
+plt.imshow(image_ill[1])
+plt.show()
+plt.imshow(images[1])
 
 # Create and save augmented images
 def create_brightness_test_set(start, end, number):
@@ -184,24 +190,24 @@ def create_brightness_test_set(start, end, number):
     for it in range(len(bright_img)):
         cv2.imwrite(os.path.join(path, filenames[it]), bright_img[it])
 
-create_brightness_test_set(.1,.4,1)
-print('done')
-create_brightness_test_set(.4,.7,2)
-print('done')
-create_brightness_test_set(.7,1,3)
-print('done')
-create_brightness_test_set(1,1.3,4)
-print('done')
-create_brightness_test_set(1.3,1.6,5)
-print('done')
-create_brightness_test_set(1.6,1.9,6)
-print('done')
-create_brightness_test_set(1.9,2.2,7)
-print('done')
-create_brightness_test_set(2.2,2.5,8)
-print('done')
-create_brightness_test_set(2.5,2.8,9)
-print('done')
-create_brightness_test_set(2.8,3.1,10)
-print('done creating test set.')
+#create_brightness_test_set(.1,.4,1)
+#print('done')
+#create_brightness_test_set(.4,.7,2)
+#print('done')
+#create_brightness_test_set(.7,1,3)
+#print('done')
+#create_brightness_test_set(1,1.3,4)
+#print('done')
+#create_brightness_test_set(1.3,1.6,5)
+#print('done')
+#create_brightness_test_set(1.6,1.9,6)
+#print('done')
+#create_brightness_test_set(1.9,2.2,7)
+#print('done')
+#create_brightness_test_set(2.2,2.5,8)
+#print('done')
+#create_brightness_test_set(2.5,2.8,9)
+#print('done')
+#create_brightness_test_set(2.8,3.1,10)
+#print('done creating test set.')
 
