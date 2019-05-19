@@ -19,6 +19,7 @@ class ModelTester():
     self._load_device()
     self._load_trained_model()
     self._load_labels_dict()
+    self.results = {}
 
 
   def _load_device(self):
@@ -80,7 +81,7 @@ class ModelTester():
 
     data_loader = torch.utils.data.DataLoader(self.crt_dataset, batch_size = 256, shuffle = False)
 
-    pred_mask, wrong_idx, wrong_imgs = [], [], []
+    pred_mask, img_names, img_preds = [], [], []
     for batch in data_loader:
       inputs = batch['image']
       labels = batch['label']
@@ -94,22 +95,30 @@ class ModelTester():
       #probs, preds = probs.numpy(), preds.numpy()
 
       pred_mask  += (labels.cpu().numpy() == preds.cpu().numpy()).tolist()
-      wrong_imgs += fnames
+      img_names  += fnames
+      img_preds  += preds.cpu().numpy().tolist()
 
-    wrong_idx = np.where(np.array(pred_mask) == False)[0].tolist()
-    wrong_imgs = np.array(wrong_imgs)[wrong_idx].tolist()
-    wrong_imgs = [e.encode() for e in wrong_imgs]
+
+    wrong_img_idxs  = np.where(np.array(pred_mask) == False)[0].tolist()
+    wrong_img_names = np.array(img_names)[wrong_img_idxs].tolist()
+
+    crt_results = []
+    for i, (img, pred) in enumerate(zip(img_names, img_preds)):
+      if i in wrong_img_idxs:
+        crt_results.append([img, self.labels_dict[img], str(pred)])
+      if img not in self.results:
+        self.results[img] = [self.labels_dict[img], str(pred)]
+      else:
+        self.results[img].append(str(pred))
+
     accuracy = sum(pred_mask) / self.crt_size
 
     self.logger.log("Accuracy at test: {:.2f}".format(accuracy), tabs = 1)
-    self.logger.log("Number of wrong images: {}".format(len(wrong_imgs)), tabs = 1)
+    self.logger.log("Number of wrong images: {}".format(len(wrong_img_idxs)), tabs = 1)
     filename_wrong_imgs = self.crt_folder +  "_wrong" + ".csv"
     self.logger.log("Save wrong images filenames to {}".format(filename_wrong_imgs))
-    with open(self.logger.get_output_file(filename_wrong_imgs), 'a', newline = '') as fp:
-      writer = csv.writer(fp, delimiter=',', dialect='excel')
-      for row in wrong_imgs:
-        writer.writerow([str(row)])
-        #writer.writerow(os.linesep)
+    crt_results_df = pd.DataFrame(crt_results, columns = ["Name", "Orig_Label", "Pred_Label"])
+    crt_results_df.to_csv(self.logger.get_output_file(filename_wrong_imgs), index = False)
 
 
   def _run_test_on_aug(self, folders_list):
@@ -127,15 +136,35 @@ class ModelTester():
     self._run_prediction()
 
 
+  def _save_results(self):
+
+    rows = [np.concatenate([[key], values]).tolist() for key, values in self.results.items()]
+    self.rows = rows
+    print(len(rows[-1]))
+    print(self.res_columns)
+    results_df = pd.DataFrame(rows, columns = self.res_columns)
+    results_df.to_csv(self.logger.get_output_file("vgg16_results.csv"), index = False)
+
+
   def run_tests(self):
 
     self._run_test_on_orig()
+    self.res_columns = ["Name", "Orig_Label", "Pred_Label"]
 
     blurred_folders = ["Blurred_" + str(i) for i in range(5, 20, 5)]
     self._run_test_on_aug(blurred_folders)
+    self.res_columns += ["Pred_" + folder + "_Label" for folder in blurred_folders]
 
-    bright_folders = ["Bright_" + str(i) for i in range(1, 11)]
+    dark_folders = ["Dark_" + str(i) for i in range(1, 4)]
+    self._run_test_on_aug(dark_folders)
+    self.res_columns += ["Pred_" + folder + "_Label" for folder in dark_folders]
+
+    bright_folders = ["Bright_" + str(i) for i in range(1, 8)]
     self._run_test_on_aug(bright_folders)
+    self.res_columns += ["Pred_" + folder + "_Label" for folder in bright_folders]
 
     occlud_folders = ["Occl_" + str(i) for i in range(5, 30, 5)]
     self._run_test_on_aug(occlud_folders)
+    self.res_columns += ["Pred_" + folder + "_Label" for folder in occlud_folders]
+
+    self._save_results()
