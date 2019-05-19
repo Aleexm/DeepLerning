@@ -5,6 +5,8 @@ import json
 
 from utils import get_drive_path
 
+import torch
+
 _HTML_START = "<HEAD><meta http-equiv='refresh' content='100' ></HEAD><BODY><pre>"
 _HTML_END = "</pre></BODY>"
 
@@ -72,6 +74,15 @@ class Logger():
 
   def get_time_prefix(self):
     return dt.strftime(dt.now(), '%Y-%m-%d_%H_%M_%S')
+
+
+  def save_model(self, model, model_name, epoch, loss):
+    
+    model_path  = model_name + "_E" + str(epoch) + "_L" + "{:.2f}".format(loss) + "_"
+    model_path += self.get_time_prefix()
+    model_path += ".ptm"
+    torch.save(model, self.get_model_file(model_path))
+    self.log("Done saving model to {}".format(model_path), show_time = True)
 
   def create_file(self):
 
