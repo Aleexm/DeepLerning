@@ -1,8 +1,12 @@
 {
   "APP_FOLDER" : "Deep-Learning-Team16",
   "DATA_FOLDER"  : "data",
-  "NUM_CLASSES" : "42",
-  "TRAINED_MODEL": "VGG16_E41_L0.05_2019-05-15_17_18_42.ptm" ,
+  "NUM_CLASSES" : "43",
+  "TRAINED_MODEL": "VGG16_E41_L0.04_2019-05-19_15_00_45.ptm",
   "LABELS_FILE": "Test.csv",
-  "AUG_TEST_FOLDER": "Augmented_test_sets"
+  "AUG_TEST_FOLDER": "Augmented_test_sets",
+  "RESULTS_FILE": "vgg16_results.csv",
+  "MODEL_TO_TRAIN": "VGG16",
+  "TRAIN_FOLDER": "Train",
+  "INPUT_SIZE": 32
 }
