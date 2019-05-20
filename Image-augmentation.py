@@ -53,19 +53,22 @@ print(filenames[1])
 # In[ ]:
 
 
-def augment_motion_blur(img, size):
+def augment_motion_blur(img, width_perc):
     # Add motion blur to the image in the form of horizontal pixel averaging
     #
     # img: an array of mulitple images.
     # size: size of the convolution kernel, larger size means more motion blur.
     
     output = []
-    # generating the kernel
-    kernel_motion_blur = np.zeros((size, size))
-    kernel_motion_blur[int((size-1)/2), :] = np.ones(size)
-    kernel_motion_blur = kernel_motion_blur / size
-    
+
     for image in img:
+    	# determine filter size
+        imgH, imgW, _ = image.shape
+        size = imgW*width_perc/100
+        # generating the kernel
+    	kernel_motion_blur = np.zeros((size, size))
+    	kernel_motion_blur[int((size-1)/2), :] = np.ones(size)
+    	kernel_motion_blur = kernel_motion_blur / size
         # applying the kernel to the input image
         blurred_img = cv2.filter2D(image, -1, kernel_motion_blur)
         #blurred_img = cv2.cvtColor(blurred_img, cv2.COLOR_BGR2RGB)
