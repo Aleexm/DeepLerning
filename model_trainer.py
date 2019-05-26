@@ -28,9 +28,16 @@ class ModelTrainer():
   def __init__(self, logger):
 
     self.logger = logger
+    self.train_type = self.logger.config_dict['TRAIN_TYPE']
+    self.data, self.labels = None, None
     self._load_model()
     self._load_device()
-    self._load_data()
+    if self.train_type == "INITIAL_TRAINING":
+      self._load_data()
+    else:
+      self._load_additional_data()
+      self._load_data()
+      self.model_type += self.train_type
 
 
   def _load_device(self):
@@ -47,16 +54,17 @@ class ModelTrainer():
     self.num_classes = int(self.logger.config_dict['NUM_CLASSES'])
     if self.model_type == "VGG16":
       self._load_vgg()
+    elif self.model_type == "CUSTOMVGG":
+      self._load_custom_vgg()
 
 
-  def _load_vgg(self, pretrained = True):
+  def _load_custom_vgg(self, pretrained = True):
 
-    self.logger.log("Start loading {} VGG16 model ...".format(
+    self.logger.log("Start loading {} custom VGG model ...".format(
       "pretrained" if pretrained else ""))
     self.model = models.vgg16(pretrained = pretrained)
     self._set_parameter_requires_grad(feature_extracting = False)
-    num_feats = self.model.classifier[6].in_features
-    self.model.classifier[6] = nn.Linear(num_feats, self.num_classes)
+    self.model.classifier = nn.Linear(self.model.classifier[0].in_features, self.num_classes)
     self.logger.log("Finished loading model", show_time = True)
 
     self.train_transform = transforms.Compose([
@@ -71,15 +79,83 @@ class ModelTrainer():
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
 
 
+  def _load_vgg(self, pretrained = True):
+
+    self.logger.log("Start loading {} VGG16 model ...".format(
+      "pretrained" if pretrained else ""))
+    self.model = models.vgg16(pretrained = pretrained)
+    self._set_parameter_requires_grad(feature_extracting = False)
+    num_feats = self.model.classifier[6].in_features
+    self.model.classifier[6] = nn.Linear(num_feats, self.num_classes)
+    self.logger.log("Finished loading model", show_time = True)
+    
+
+    self.train_transform = transforms.Compose([
+        transforms.RandomResizedCrop(self.input_size),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+    self.valid_transform = transforms.Compose([
+        transforms.Resize(self.input_size),
+        transforms.CenterCrop(self.input_size),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+
+
+  def _split_train_valid(self, batch_size = 256):
+
+    self.logger.log("Splitting in 90%/10% train/validation")
+    X_train, X_valid, y_train, y_valid = train_test_split(
+      self.data, self.labels, test_size = 0.10, random_state = 13)
+
+    train_dict = {'X': X_train, 'y': y_train}
+    valid_dict = {'X': X_valid, 'y': y_valid}
+
+    train_dataset = ImageDataset(train_dict, self.logger,
+      transform = self.train_transform)
+    valid_dataset = ImageDataset(valid_dict, self.logger,
+      transform = self.valid_transform)
+
+    self.dataloaders = {
+      'train': 
+        torch.utils.data.DataLoader(train_dataset, batch_size = batch_size, shuffle = True),
+      'valid':
+        torch.utils.data.DataLoader(valid_dataset, batch_size = batch_size, shuffle = True)
+    }
+    self.data, self.labels = None, None
+
+
+  def _load_additional_data(self):
+
+    data, labels = [], []
+    train_folder = self.logger.config_dict['ADDITIONAL_TRAIN_FOLDER']
+
+    self.logger.log("Start loading additional data from {}...".format(
+      train_folder))
+    directory = os.path.join(self.logger.data_folder, train_folder)
+
+    for subdir in os.listdir(directory):
+      if os.path.isdir(os.path.join(directory, subdir)):
+        crt_label = int(subdir.split('-')[-1])
+        for file in os.listdir(os.path.join(directory, subdir)):
+          if file.endswith(".ppm") and file[0] != 'G':
+            data.append(cv2.imread(self.logger.get_data_file(
+              file, os.path.join(train_folder, subdir))))
+            labels.append(crt_label)
+
+    self.logger.log("Finished loading data: {} entries".format(len(labels)), show_time = True)
+    self.data, self.labels = data, labels
+
+
   def _load_data(self):
 
-    data = []
-    labels = []
-    train_folder = self.logger.config_dict['TRAIN_FOLDER'] 
+    data, labels = [], []
+    train_folder = self.logger.config_dict['TRAIN_FOLDER']
 
-    self.logger.log("Start loading data...")
+    self.logger.log("Start loading data from {}...".format(train_folder))
     for i in tqdm(range(self.num_classes)):
-      directory = os.fsencode(os.path.join(self.logger.data_folder, train_folder, str(i)))
+      directory = os.fsencode(os.path.join(
+        self.logger.data_folder, train_folder, str(i)))
 
       for file in os.listdir(directory):
         filename = os.fsdecode(file)
@@ -88,24 +164,15 @@ class ModelTrainer():
             train_folder, str(i)))))
           labels.append(i)
 
-    self.logger.log("Finished loading data", show_time = True)
-
-    self.logger.log("Splitting in 90%/10% train/validation")
-    X_train, X_valid, y_train, y_valid = train_test_split(data, labels, test_size = 0.10,
-     random_state = 13)
-
-    train_dict = {'X': X_train, 'y': y_train}
-    valid_dict = {'X': X_valid, 'y': y_valid}
-
-    train_dataset = ImageDataset(train_dict, self.logger, transform = self.train_transform)
-    valid_dataset = ImageDataset(valid_dict, self.logger, transform = self.valid_transform)
-
-    self.dataloaders = {
-      'train': 
-        torch.utils.data.DataLoader(train_dataset, batch_size = 256, shuffle = True),
-      'valid':
-        torch.utils.data.DataLoader(valid_dataset, batch_size = 256, shuffle = True)
-    }
+    self.logger.log("Finished loading data: {} entries".format(len(labels)), show_time = True)
+    if self.data is not None:
+      self.data += data
+      self.labels += labels
+    else: 
+      self.data = data 
+      self.labels = labels
+    
+    self._split_train_valid()
 
 
   def _set_parameter_requires_grad(self, feature_extracting):
@@ -181,7 +248,7 @@ class ModelTrainer():
         if phase == "valid":
           if epoch % save_after_epochs == 0:
             self.logger.log("Save model at epoch {}".format(epoch + 1))
-            self.logger.save_model(self.model, "VGG16", epoch + 1, epoch_loss)
+            self.logger.save_model(self.model, self.model_type, epoch + 1, epoch_loss)
 
           validation_acc_list.append(epoch_acc) 
           validation_loss_list.append(epoch_loss)
@@ -191,12 +258,12 @@ class ModelTrainer():
       self.logger.log("Finish epoch no {} in {:.2f}s".format(epoch + 1, time.time() - start_time))
 
     t.close()
-    self._plot_loss_history(training_loss_list, validation_loss_list)
     self.logger.log("Save best model")
-    self.logger.save_model(best_model, "VGG16_BEST", best_epoch + 1, best_loss)
-
+    self.logger.save_model(best_model, self.model_type + "_BEST", best_epoch + 1, best_loss)
     self.model = copy.deepcopy(best_model)
 
+    self._plot_loss_history(training_loss_list, validation_loss_list)
+    
 
   def _plot_loss_history(self, training_list, validation_list):
 
@@ -204,9 +271,9 @@ class ModelTrainer():
     sns.set()
 
     tmstp = self.logger.get_time_prefix()
-    with open(self.logger.get_output_file("train_loss_" + tmstp + ".pkl"), 'wb') as fp:
+    with open(self.logger.get_output_file(self.model_type + "_train_loss_" + tmstp + ".pkl"), 'wb') as fp:
       pkl.dump(training_list, fp)
-    with open(self.logger.get_output_file("valid_loss_" + tmstp + ".pkl"), 'wb') as fp:
+    with open(self.logger.get_output_file(self.model_type + "_valid_loss_" + tmstp + ".pkl"), 'wb') as fp:
       pkl.dump(validation_list, fp)
 
     epochs = np.array(range(len(training_list)))

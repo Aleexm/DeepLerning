@@ -8,3 +8,4 @@ if __name__ == '__main__':
 
   trainer = ModelTrainer(logger)
   trainer.run_training(num_epochs = 50, save_after_epochs = 10)
+
