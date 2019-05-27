@@ -28,11 +28,12 @@ class ModelTester():
 
   def _load_trained_model(self):
 
-    self.logger.log("Start loading model...")
     model_file = self.logger.config_dict['TRAINED_MODEL']
+    self.logger.log("Start loading model from {}...".format(model_file))
     self.model = torch.load(self.logger.get_model_file(model_file))
     self.model.to(self.device)
     self.logger.log("Finish loading model", show_time = True)
+    self.model_type = model_file.split('_')[0]
 
 
   def _load_labels_dict(self):
@@ -47,7 +48,7 @@ class ModelTester():
 
   def _load_orig_test_data(self):
     
-    path_in_data_folder = "Test"
+    path_in_data_folder = self.logger.config_dict['TEST_FOLDER']
     self._load_test_data(path_in_data_folder)
 
 
@@ -80,6 +81,7 @@ class ModelTester():
   def _run_prediction(self):
 
     data_loader = torch.utils.data.DataLoader(self.crt_dataset, batch_size = 256, shuffle = False)
+    self.model.eval()
 
     pred_mask, img_names, img_preds = [], [], []
     for batch in data_loader:
@@ -115,7 +117,7 @@ class ModelTester():
 
     self.logger.log("Accuracy at test: {:.2f}".format(accuracy), tabs = 1)
     self.logger.log("Number of wrong images: {}".format(len(wrong_img_idxs)), tabs = 1)
-    filename_wrong_imgs = self.crt_folder +  "_wrong" + ".csv"
+    filename_wrong_imgs = self.model_type + "_" + self.crt_folder +  "_wrong" + ".csv"
     self.logger.log("Save wrong images filenames to {}".format(filename_wrong_imgs))
     crt_results_df = pd.DataFrame(crt_results, columns = ["Name", "Orig_Label", "Pred_Label"])
     crt_results_df.to_csv(self.logger.get_output_file(filename_wrong_imgs), index = False)
@@ -138,12 +140,12 @@ class ModelTester():
 
   def _save_results(self):
 
-    rows = [np.concatenate([[key], values]).tolist() for key, values in self.results.items()]
+    rows = [np.concatenate(
+      [[key], values]).tolist() for key, values in self.results.items()]
     self.rows = rows
-    print(len(rows[-1]))
-    print(self.res_columns)
     results_df = pd.DataFrame(rows, columns = self.res_columns)
-    results_df.to_csv(self.logger.get_output_file("vgg16_results.csv"), index = False)
+    results_filename = self.model_type + "_results.csv"
+    results_df.to_csv(self.logger.get_output_file(results_filename), index = False)
 
 
   def run_tests(self):
@@ -151,7 +153,7 @@ class ModelTester():
     self._run_test_on_orig()
     self.res_columns = ["Name", "Orig_Label", "Pred_Label"]
 
-    blurred_folders = ["Blurred_" + str(i) for i in range(5, 20, 5)]
+    blurred_folders = ["Blurred_" + str(i) for i in range(5, 25, 5)]
     self._run_test_on_aug(blurred_folders)
     self.res_columns += ["Pred_" + folder + "_Label" for folder in blurred_folders]
 

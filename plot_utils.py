@@ -30,6 +30,7 @@ def create_confusion_matrix(results_df, pred_column, logger):
   df.columns.name = 'Prediction'
   df = df.stack().rename("value").reset_index()
 
+
   colors = [matplotlib.colors.rgb2hex(c) for c in sns.color_palette("Blues")]
 
   mapper = LinearColorMapper(palette=colors, low=df.value.min(),
@@ -57,11 +58,16 @@ def create_confusion_matrix(results_df, pred_column, logger):
   hover = p.select(dict(type=HoverTool))
   hover.tooltips = [
     ("Value", "@value"),
+    ("Label", "@Label"),
+    ("Prediction", "@Prediction")
   ]
   p.add_layout(color_bar, 'right')
 
-  output_file(logger.get_output_file("{}_cmat.html".format(pred_column)))
+  model_type = logger.config_dict['RESULTS_FILE'].split('_')[0]
+  output_file(logger.get_output_file("{}_{}_cmat.html".format(model_type, pred_column)))
   save(p)
+
+  return df
 
 
 if __name__ == '__main__':
@@ -69,12 +75,12 @@ if __name__ == '__main__':
   logger = Logger(show = True, html_output = True, config_file = "config.txt",
     data_folder = "drive")
 
-  results_df = pd.read_csv(logger.get_output_file(
-    logger.config_dict['RESULTS_FILE']))
+  results_filename = logger.config_dict['RESULTS_FILE']
+  results_df = pd.read_csv(logger.get_output_file(results_filename))
 
-  create_confusion_matrix(results_df, "Orig_Label", logger)
+  df = create_confusion_matrix(results_df, "Pred_Label", logger)
 
-  blurred_cols = ["Pred_Blurred_" + str(i) + "_Label" for i in range(5, 20, 5)]
+  blurred_cols = ["Pred_Blurred_" + str(i) + "_Label" for i in range(5, 25, 5)]
   for col in blurred_cols:
     create_confusion_matrix(results_df, col, logger)
 
@@ -89,3 +95,4 @@ if __name__ == '__main__':
   occl_cols = ["Pred_Occl_" + str(i) + "_Label" for i in range(5, 30, 5)]
   for col in occl_cols:
     create_confusion_matrix(results_df, col, logger)
+
