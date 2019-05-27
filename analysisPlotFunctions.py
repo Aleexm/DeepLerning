@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
+import seaborn as sns
 
 def plotClassAccuracy(df1, df2, label):
     '''Plot Accuracy per class for given test-set (e.g. Pred_Blurred_15_Label), for both German (df1) and Eur (df2) datasets,
@@ -26,6 +27,7 @@ def plotClassAccuracy(df1, df2, label):
         if row['Pred_Label'] == key:
             origAccEur[key] += 1/priorClass2[key]
     figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
+    sns.set()
     w=0.2
     plt.bar(np.arange(0,43,1)-1.5*w, origAccGer, width=w, label = "Orig Test Set added Eur", color = 'blue')
     plt.bar(np.arange(0,43,1)-0.5*w, origAccEur, width=w, label = "Orig Test Set added Augmented Eur", color = 'red')
@@ -37,7 +39,7 @@ def plotClassAccuracy(df1, df2, label):
     plt.legend(prop={'size': 14})
     plt.title("Class ~ Accuracy {}".format(label), size= 14)
     fig = plt.gcf()
-    # fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/classErr_{}.png".format(label), quality = 95, bbox_inches = 'tight')
+    fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/classErr_{}.png".format(label), quality = 95, bbox_inches = 'tight')
     plt.show()
     # print(accuracies[0])
 
@@ -61,6 +63,7 @@ def plotBothFeat(df1, df2, feat):
     x = np.arange(0,43,1)
     w = 0.15
     figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
+    sns.set()
     plt.bar(x-2*w, orig, width =w, label = "Original")
     plt.bar(x-1*w, predOrigGer, width =w, label = "Orig pred Eur")
     plt.bar(x, predOrigEur, width =w, label = "Orig pred Aug")
@@ -72,7 +75,7 @@ def plotBothFeat(df1, df2, feat):
     plt.legend(prop={'size': 14})
     plt.title("Class ~ {} Predictions".format(feat), size= 14)
     fig = plt.gcf()
-    # fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/{}_err.png".format(feat), quality = 95, bbox_inches = 'tight')
+    fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/{}_err.png".format(feat), quality = 95, bbox_inches = 'tight')
     plt.show()
 
 
@@ -98,6 +101,7 @@ def plotPredFeat(df, feat, lab1, lab2, lab3, levels):
     x = np.arange(0,43,1)
     w = 0.15
     figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
+    sns.set()
     plt.bar(x-2*w, orig, width=w, color='b', align='center', label = "True Label")
     plt.bar(x-w, pred, width=w, color='g', align='center', label = "Original Prediction")
     plt.bar(x, predb5, width=w, color='r', align='center', label = "{} {} Prediction".format(feat, levels[0]))
@@ -109,5 +113,5 @@ def plotPredFeat(df, feat, lab1, lab2, lab3, levels):
     plt.title("Class predictions for various {} levels.".format(feat), size = 14)
     plt.legend(prop={'size': 14})
     fig = plt.gcf()
-    # fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/{}_predictions.png".format(feat), quality = 95, bbox_inches = 'tight')
+    fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/{}_predictions.png".format(feat), quality = 95, bbox_inches = 'tight')
     plt.show()
