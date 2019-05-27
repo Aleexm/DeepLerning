@@ -100,8 +100,10 @@ def plotPredFeat(df, feat, lab1, lab2, lab3, levels):
 
     x = np.arange(0,43,1)
     w = 0.15
+    sns.set()
     figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
     sns.set()
+    ax = plt.subplot(111)
     plt.bar(x-2*w, orig, width=w, color='b', align='center', label = "True Label")
     plt.bar(x-w, pred, width=w, color='g', align='center', label = "Original Prediction")
     plt.bar(x, predb5, width=w, color='r', align='center', label = "{} {} Prediction".format(feat, levels[0]))
@@ -111,7 +113,10 @@ def plotPredFeat(df, feat, lab1, lab2, lab3, levels):
     plt.xlabel("Class", size = 14)
     plt.ylabel("Prediction Count", size = 14)
     plt.title("Class predictions for various {} levels.".format(feat), size = 14)
-    plt.legend(prop={'size': 14})
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+    plt.legend(prop={'size': 14}, loc = 'center left', bbox_to_anchor=(1, 0.5), 
+        fancybox=True, shadow=True)
     fig = plt.gcf()
     fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/{}_predictions.png".format(feat), quality = 95, bbox_inches = 'tight')
     plt.show()

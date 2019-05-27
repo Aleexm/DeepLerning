@@ -5,11 +5,11 @@
   "NUM_CLASSES" : "43",
   "INPUT_SIZE": 32,
   "TRAIN_FOLDER": "Train",
-  "ADDITIONAL_TRAIN_FOLDER": "European_light",
+  "ADDITIONAL_TRAIN_FOLDER-": "European_light",
   "TEST_FOLDER": "Test",
   "LABELS_FILE": "Test.csv",
   "AUG_TEST_FOLDER": "Augmented_test_sets",
-  "TRAINED_MODEL-": "VGG16ADDEUR_BEST_E48_L0.05_2019-05-20_19_38_15.ptm",
-  "RESULTS_FILE-": "VGG16ADDEUR_results.csv",
-  "TRAIN_TYPE": "ADDLIGHT"
+  "TRAINED_MODEL-": "VGG16ADDOCCL_BEST_E41_L0.08_2019-05-24_01_53_23.ptm",
+  "RESULTS_FILE": "VGG16ADDOCCL_results.csv",
+  "TRAIN_TYPE-": "ADDLIGHT"
 }
