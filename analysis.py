@@ -7,7 +7,7 @@ import analysisPlotFunctions as plf
 # Add correct path to csv's here.
 # Also, savefig is currently hardcoded to my desktop. You should add a valid path here if you want to save figs (which it does by default)
 # dfGer = pd.read_csv("Ger/VGG16/VGG16_results.csv")
-dfEur = pd.read_csv("C:/Users/alexm/Desktop/Eur/VGG16ADDEUR/VGG16ADDEUR_results.csv")
+dfEur = pd.read_csv("output/VGG16ADDEUR/VGG16ADDEUR_results.csv")
 dfAug = pd.read_csv("C:/Users/alexm/Desktop/BlurAug/VGG16ADDBLUR_results.csv")
 label = 'Pred_Occl_25_Label' #Class ID you want to inspect. Examples are Pred_Label, Orig_Label, Pred_Blurred_x_Label, Pred_Bright_x_Label,
 # Pred_Dark_x_Label and Pred_Occl_x_Label
@@ -21,5 +21,5 @@ plf.plotBothFeat(dfEur, dfAug, label)
 print(dfEur.loc[(dfEur['Orig_Label'] == id) & (dfEur[label] != id)][['Orig_Label', label, 'Pred_Label']])
 print(dfAug.loc[(dfAug['Orig_Label'] == id) & (dfAug[label] != id)][['Orig_Label', label, 'Pred_Label']])
 # Prints the misclassifications as, for this class id. (Found this easier than looking at the confmat)
-print(dfEur.loc[dfGer['Orig_Label'] == id][label].value_counts())
-print(dfAug.loc[dfEur['Orig_Label'] == id][label].value_counts())
+print(dfEur.loc[dfEur['Orig_Label'] == id][label].value_counts())
+print(dfAug.loc[dfGer['Orig_Label'] == id][label].value_counts())

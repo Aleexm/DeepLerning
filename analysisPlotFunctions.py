@@ -36,7 +36,7 @@ def plotClassAccuracy(df1, df2, label):
     plt.legend(prop={'size': 14})
     plt.title("Class ~ Accuracy {}".format(label), size= 14)
     fig = plt.gcf()
-    fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/classErr_{}.png".format(label), quality = 95, bbox_inches = 'tight')
+    # fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/classErr_{}.png".format(label), quality = 95, bbox_inches = 'tight')
     plt.show()
     # print(accuracies[0])
 
@@ -70,7 +70,7 @@ def plotBothFeat(df1, df2, feat):
     plt.legend(prop={'size': 14})
     plt.title("Class ~ {} Predictions".format(feat), size= 14)
     fig = plt.gcf()
-    fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/{}_err.png".format(feat), quality = 95, bbox_inches = 'tight')
+    # fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/{}_err.png".format(feat), quality = 95, bbox_inches = 'tight')
     plt.show()
 
 
@@ -106,5 +106,5 @@ def plotPredFeat(df, feat, lab1, lab2, lab3, levels):
     plt.title("Class predictions for various {} levels.".format(feat), size = 14)
     plt.legend(prop={'size': 14})
     fig = plt.gcf()
-    fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/{}_predictions.png".format(feat), quality = 95, bbox_inches = 'tight')
+    # fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/{}_predictions.png".format(feat), quality = 95, bbox_inches = 'tight')
     plt.show()
