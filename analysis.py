@@ -18,7 +18,7 @@ plf.plotBothFeat(dfEur, dfAug, label)
 
 # Finds the corresponding test ids where Ger and/or Eur misclassified this class id
 print(dfEur.loc[(dfEur['Orig_Label'] == id) & (dfEur[label] != id)][['Orig_Label', label, 'Pred_Label']])
-print(dfAug.loc[(dfAug['Orig_Label'] == id) & (dfAug[label] == 28)][['Orig_Label', label, 'Pred_Label']])
+print(dfAug.loc[(dfAug['Orig_Label'] == id) & (dfAug[label] != id)][['Orig_Label', label, 'Pred_Label']])
 # Prints the misclassifications as, for this class id. (Found this easier than looking at the confmat)
 print(dfEur.loc[dfEur['Orig_Label'] == id][label].value_counts())
 print(dfAug.loc[dfAug['Orig_Label'] == id][label].value_counts())
