@@ -56,6 +56,8 @@ class ModelTrainer():
       self._load_vgg()
     elif self.model_type == "CUSTOMVGG":
       self._load_custom_vgg()
+    elif self.model_type == "DENSENET":
+      self._load_densenet()
 
 
   def _load_custom_vgg(self, pretrained = True):
@@ -100,6 +102,29 @@ class ModelTrainer():
         transforms.CenterCrop(self.input_size),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+
+
+  def _load_densenet(self, pretrained = True):
+
+    self.logger.log("Start loading {} DenseNet model ...".format(
+      "pretrained" if pretrained else ""))
+    self.model = models.densenet121(pretrained = pretrained)
+    self._set_parameter_requires_grad(feature_extracting = False)
+    num_feats = self.model.classifier.in_features
+    self.model.classifier = nn.Linear(num_feats, self.num_classes)
+    self.logger.log("Finished loading model", show_time = True)
+    
+    self.train_transform = transforms.Compose([
+        transforms.RandomResizedCrop(self.input_size),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+    self.valid_transform = transforms.Compose([
+        transforms.Resize(self.input_size),
+        transforms.CenterCrop(self.input_size),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+
 
 
   def _split_train_valid(self, batch_size = 256):
