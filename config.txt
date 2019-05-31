@@ -1,7 +1,7 @@
 {
   "APP_FOLDER" : "Deep-Learning-Team16",
   "DATA_FOLDER"  : "data",
-  "MODEL_TO_TRAIN": "VGG16",
+  "MODEL_TO_TRAIN": "DENSENET",
   "NUM_CLASSES" : "43",
   "INPUT_SIZE": 32,
   "TRAIN_FOLDER": "Train",
@@ -9,7 +9,7 @@
   "TEST_FOLDER": "Test",
   "LABELS_FILE": "Test.csv",
   "AUG_TEST_FOLDER": "Augmented_test_sets",
-  "TRAINED_MODEL-": "VGG16ADDEUR_BEST_E48_L0.05_2019-05-20_19_38_15.ptm",
-  "RESULTS_FILE-": "VGG16ADDEUR_results.csv",
-  "TRAIN_TYPE": "ADDLIGHT"
+  "TRAINED_MODEL": "DENSENET_BEST_E99_L0.02_2019-05-29_03_52_45.ptm",
+  "RESULTS_FILE": "DENSENET_results.csv",
+  "TRAIN_TYPE": "INITIAL_TRAINING"
 }
