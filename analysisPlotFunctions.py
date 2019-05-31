@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 import seaborn as sns
+from collections import defaultdict
 
 def plotClassAccuracy(df1, df2, label):
     '''Plot Accuracy per class for given test-set (e.g. Pred_Blurred_15_Label), for both German (df1) and Eur (df2) datasets,
@@ -79,13 +80,43 @@ def plotBothFeat(df1, df2, feat):
     plt.show()
 
 def plotAccDiff():
-    f = open("output/VGG16ADDOCC/2019-05-27_01_25_52_log0.html", "r")
-    accuracies = []
-    for x in f:
-        if "Accuracy" in x.split():
-            accuracies.append(float(x.split()[-1]))
+    "Plots the accuracy difference per class from European to Augmented European for the various test-datas"
+    # Orig, Blur, Bright, Dark, Occ
+    # files = ["output/VGG16ADDEUR/2019-05-22_12_23_40_log0.html", "output/VGG16ADDBLUR/2019-05-27_00_20_22_log0.html", "output/VGG16ADDBRIGHT/2019-05-27_01_06_00_log0.html",
+    # "output/VGG16ADDDARK/2019-05-27_00_37_32_log0.html", "output/VGG16ADDOCC/2019-05-27_01_25_52_log0.html"]
+    files = ["output/VGG16/2019-05-22_12_05_06_log0.html", "output/VGG16ADDEUR/2019-05-22_12_23_40_log0.html"]
+    accuracies = defaultdict(list)
+    diffAcc = defaultdict(list)
+    for name in files:
+        key = name
+        f = open(name)
+        for x in f:
+            if "Number" in x.split() and "wrong" in x.split():
+                accuracies[key].append(int(x.split()[-1]))
+        diffAcc[key] = [(1 - (float(accuracies[key][i] / 12631))) - (1 - (float(accuracies[files[0]][i] / 12631))) for i in range(len(accuracies[key]))]
+    x = np.arange(0,20,1)
+    w = 0.8
+    figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
+    sns.set()
+    i = 0
+    print(accuracies["output/VGG16ADDEUR/2019-05-22_12_23_40_log0.html"])
+    # labels = ["Blurred", "Brightened", "Darkened", "Occluded"]
+    labels = ["European"]
+    for idx,name in enumerate(files[1:]):
 
-    print(accuracies)
+        plt.bar(x+(idx-1.5)*w, diffAcc[name], width=w, align='center', label = labels[idx])
+
+    xlabs = ["Orig", "Blur5", "Blur10", "Blur15", "Blur20", "Dark1", "Dark2", "Dark3", "Bright1", "Bright2", "Bright3", "Bright4","Bright5","Bright6", "Bright7", "Occl5", "Occl10", "Occl15", "Occl20", "Ocll25"]
+    plt.xticks(ticks= x, labels = xlabs, size = 12)
+    plt.xlabel("Test Set", size = 20)
+    plt.ylabel("Accuracy difference", size = 20)
+    plt.axhline(y = 0.0018, color = 'b', label = 'Significance threshold')
+    plt.axhline(y = -0.0018, color = 'b')
+    plt.legend(prop={'size': 14})
+    fig = plt.gcf()
+    fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/AccuracyDifference.png", quality = 95, bbox_inches = 'tight')
+    plt.show()
+
 def plotPredFeat(df, feat, lab1, lab2, lab3, levels):
     '''Not currently called from plots.py. I used this initially  for one dataframe.
     You can use this to plot 3 features (e.g. Pred_Blurred_15_Label, Pred_Blurred_10_Label and Pred_Blurred_5_Label)
