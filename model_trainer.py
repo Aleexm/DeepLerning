@@ -34,6 +34,10 @@ class ModelTrainer():
     self._load_device()
     if self.train_type == "INITIAL_TRAINING":
       self._load_data()
+    elif self.train_type == "ADDALL":
+      self._load_all_randomize_additional_data()
+      self._load_data()
+      self.model_type += self.train_type
     else:
       self._load_additional_data()
       self._load_data()
@@ -150,10 +154,35 @@ class ModelTrainer():
     self.data, self.labels = None, None
 
 
-  def _load_additional_data(self):
+  def _load_all_randomize_additional_data(self):
+
+    blur_data, blur_labels = self._load_additional_data(train_folder = "European_blurred")
+    dark_data, dark_labels = self._load_additional_data(train_folder = "European_dark")
+    light_data, light_labels = self._load_additional_data(train_folder = "European_light")
+    occluded_data, occluded_labels = self._load_additional_data(train_folder = "European_occluded")
+
+    all_data = [blur_data, dark_data, light_data, occluded_data]
+    all_labels = [blur_labels, dark_labels, light_labels, occluded_labels]
+
+    self.logger.log("Randomly choose from additional data")
+    comb_data, comb_labels = [], []
+    for i in range(len(self.data)):
+      crt_type = np.random.choice(range(len(all_data)))
+      comb_data.append(all_data[crt_type][i])
+      comb_labels.append(all_labels[crt_type][i])
+
+    self.logger.log("Finished choosing additional data: {} entries".format(len(comb_data)), 
+      show_time = True)
+
+    self.data = comb_data
+    self.labels = comb_labels
+
+
+  def _load_additional_data(self, train_folder = None):
 
     data, labels = [], []
-    train_folder = self.logger.config_dict['ADDITIONAL_TRAIN_FOLDER']
+    if train_folder is None:
+      train_folder = self.logger.config_dict['ADDITIONAL_TRAIN_FOLDER']
 
     self.logger.log("Start loading additional data from {}...".format(
       train_folder))
@@ -170,6 +199,8 @@ class ModelTrainer():
 
     self.logger.log("Finished loading data: {} entries".format(len(labels)), show_time = True)
     self.data, self.labels = data, labels
+
+    return data, labels
 
 
   def _load_data(self):
