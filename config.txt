@@ -1,15 +1,15 @@
 {
   "APP_FOLDER" : "Deep-Learning-Team16",
   "DATA_FOLDER"  : "data",
-  "MODEL_TO_TRAIN": "DENSENET",
+  "MODEL_TO_TRAIN": "VGG16",
   "NUM_CLASSES" : "43",
   "INPUT_SIZE": 32,
   "TRAIN_FOLDER": "Train",
-  "ADDITIONAL_TRAIN_FOLDER": "European_occluded",
+  "ADDITIONAL_TRAIN_FOLDER-": "European_occluded",
   "TEST_FOLDER": "Test",
   "LABELS_FILE": "Test.csv",
   "AUG_TEST_FOLDER": "Augmented_test_sets",
-  "TRAINED_MODEL": "DENSENETADDALL_BEST_E87_L0.06_2019-06-08_22_23_11.ptm",
-  "RESULTS_FILE": "DENSENETADDALL_results.csv",
-  "TRAIN_TYPE": "ADDALL"
+  "TRAINED_MODEL": "VGG16ADDALL_BEST_E49_L0.08_2019-06-09_15_52_35.ptm",
+  "RESULTS_FILE": "VGG16ADDALL_results.csv",
+  "TRAIN_TYPE-": "ADDALL"
 }

@@ -7,5 +7,5 @@ if __name__ == '__main__':
     data_folder = "drive")
 
   trainer = ModelTrainer(logger)
-  trainer.run_training(num_epochs = 100, save_after_epochs = 10)
+  trainer.run_training(num_epochs = 50, save_after_epochs = 10)
 
