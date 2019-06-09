@@ -164,16 +164,16 @@ class ModelTester():
     for folder in folders_list:
       self.logger.log("Test on {}".format(folder))
       self._load_aug_test_data(folder)
-      #self._get_mean_confidence()
-      self._run_prediction()
+      self._get_mean_confidence()
+      #self._run_prediction()
 
 
   def _run_test_on_orig(self):
 
     self.logger.log("Test on original")
     self._load_orig_test_data()
-    #self._get_mean_confidence()
-    self._run_prediction()
+    self._get_mean_confidence()
+    #self._run_prediction()
 
 
   def _save_results(self):
@@ -207,4 +207,4 @@ class ModelTester():
     self._run_test_on_aug(occlud_folders)
     self.res_columns += ["Pred_" + folder + "_Label" for folder in occlud_folders]
 
-    self._save_results()
+    #self._save_results()
