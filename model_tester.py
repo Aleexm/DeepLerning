@@ -78,6 +78,42 @@ class ModelTester():
     self.crt_size = len(fnames)
 
 
+  def _get_mean_confidence(self):
+
+    data_loader = torch.utils.data.DataLoader(self.crt_dataset, batch_size = 256, shuffle = False)
+    self.model.eval()
+
+    pred_mask, probs_list = [], []
+    for batch in data_loader:
+      inputs = batch['image']
+      labels = batch['label']
+      fnames = batch['fname']
+
+      inputs_pt = inputs.to(self.device)
+      labels_pt = labels.to(self.device)
+      outputs_pt = self.model(inputs_pt)
+
+      outputs_pt = torch.nn.Softmax(dim = 0)(outputs_pt)
+
+      probs, preds = torch.max(outputs_pt, dim = 1)
+      #probs, preds = probs.numpy(), preds.numpy()
+
+      pred_mask  += (labels.cpu().numpy() == preds.cpu().numpy()).tolist()
+      probs_list += probs.detach().cpu().numpy().tolist()
+
+
+    wrong_img_idxs  = np.where(np.array(pred_mask) == False)[0].tolist()
+    mask = np.ones(len(probs_list), dtype = bool)
+    mask[wrong_img_idxs] = False
+    correct_probs = np.array(probs_list)[mask]
+    wrong_probs   = np.array(probs_list)[wrong_img_idxs]
+
+    self.logger.log("Mean confidence for correct images: {:.2f}".format(
+      correct_probs.mean()), tabs = 1)
+    self.logger.log("Mean confidence for wrong images: {:.2f}".format(
+      wrong_probs.mean()), tabs = 1)
+
+
   def _run_prediction(self):
 
     data_loader = torch.utils.data.DataLoader(self.crt_dataset, batch_size = 256, shuffle = False)
@@ -128,6 +164,7 @@ class ModelTester():
     for folder in folders_list:
       self.logger.log("Test on {}".format(folder))
       self._load_aug_test_data(folder)
+      #self._get_mean_confidence()
       self._run_prediction()
 
 
@@ -135,6 +172,7 @@ class ModelTester():
 
     self.logger.log("Test on original")
     self._load_orig_test_data()
+    #self._get_mean_confidence()
     self._run_prediction()
 
 
