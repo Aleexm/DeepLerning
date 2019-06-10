@@ -9,7 +9,8 @@
   "TEST_FOLDER": "Test",
   "LABELS_FILE": "Test.csv",
   "AUG_TEST_FOLDER": "Augmented_test_sets",
-  "TRAINED_MODEL": "VGG16ADDALL_BEST_E49_L0.08_2019-06-09_15_52_35.ptm",
+  "IMAGES_FEAT_MAPS": "Images_FeatureMaps",
+  "TRAINED_MODEL": "VGG16_BEST_E41_L0.06_2019-05-19_25_15_13.ptm",
   "RESULTS_FILE": "VGG16ADDALL_results.csv",
   "TRAIN_TYPE-": "ADDALL"
 }
