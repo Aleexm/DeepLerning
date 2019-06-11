@@ -103,7 +103,7 @@ if __name__ == '__main__':
   logger.log("Finish loading model", show_time = True)
   
   #[("Blur-VGG", 4) , ("E-VGG", 8) , ("G-VGG", 12)]
-  folder, num_images = ("G-VGG_new", 2)
+  folder, num_images = ("G-VGG_new", 6)
 
   for i in range(num_images):
     (original_image, prep_img, target_class, base_file_name_to_export) =\
