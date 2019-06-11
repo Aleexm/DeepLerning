@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 import seaborn as sns
+from collections import defaultdict
 
 def plotClassAccuracy(df1, df2, label):
     '''Plot Accuracy per class for given test-set (e.g. Pred_Blurred_15_Label), for both German (df1) and Eur (df2) datasets,
@@ -17,7 +18,7 @@ def plotClassAccuracy(df1, df2, label):
     for idx,row in df1.iterrows():
         key = row['Orig_Label']
         if row[label] == key:
-            accuracies1[key] += 1/priorClass2[key]
+            accuracies1[key] += 1/priorClass1[key]
         if row['Pred_Label'] == key:
             origAccGer[key] += 1/priorClass1[key]
     for idx,row in df2.iterrows():
@@ -39,7 +40,7 @@ def plotClassAccuracy(df1, df2, label):
     plt.legend(prop={'size': 14})
     plt.title("Class ~ Accuracy {}".format(label), size= 14)
     fig = plt.gcf()
-    # fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/classErr_{}.png".format(label), quality = 95, bbox_inches = 'tight')
+    fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/classErr_{}.png".format(label), quality = 95, bbox_inches = 'tight')
     plt.show()
     # print(accuracies[0])
 
@@ -78,14 +79,42 @@ def plotBothFeat(df1, df2, feat):
     # fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/{}_err.png".format(feat), quality = 95, bbox_inches = 'tight')
     plt.show()
 
-def plotAccDiff():
-    f = open("output/VGG16ADDOCC/2019-05-27_01_25_52_log0.html", "r")
-    accuracies = []
-    for x in f:
-        if "Accuracy" in x.split():
-            accuracies.append(float(x.split()[-1]))
+def plotAccDiff(files, names):
+    "Plots the accuracy difference per class from base to all other networks as described in names"
+    # Orig, Blur, Bright, Dark, Occ
+    # files = ["output/VGG16ADDEUR/2019-05-22_12_23_40_log0.html", "output/VGG16ADDBLUR/2019-05-27_00_20_22_log0.html", "output/VGG16ADDBRIGHT/2019-05-27_01_06_00_log0.html",
+    # "output/VGG16ADDDARK/2019-05-27_00_37_32_log0.html", "output/VGG16ADDOCC/2019-05-27_01_25_52_log0.html"]
+    # files = ["output/DENSENETADDEUR/2019-06-01_14_30_28_log0.html", "output/DENSENETADDBLUR/2019-06-02_13_45_25_log0.html", "output/DENSENETADDLIGHT/2019-06-02_22_15_08_log0.html",
+    # "output/DENSENETADDDARK/2019-06-02_14_11_11_log0.html", "output/DENSENETADDOCCL/2019-05-27_01_25_52_log0.html"]
+    # names = ["DENSE_EUR", "DENSE_BLUR", "DENSE_BRIGHT", "DENSE_DARK", "DENSE_OCCL"]
+    accuracies = defaultdict(list)
+    diffAcc = defaultdict(list)
+    for name in files:
+        key = name
+        f = open(name)
+        for x in f:
+            if "Number" in x.split() and "wrong" in x.split():
+                accuracies[key].append(int(x.split()[-1]))
+        diffAcc[key] = [(1 - (float(accuracies[key][i] / 12631))) - (1 - (float(accuracies[files[0]][i] / 12631))) for i in range(len(accuracies[key]))]
+    x = np.arange(0,20,1)
+    w = 1/len(files)
+    figure(num=None, figsize=(20, 10), dpi=80, facecolor='w', edgecolor='k')
+    sns.set()
+    i = 0
+    print(accuracies[files[0]])
+    for idx,name in enumerate(files[1:]):
+        plt.bar(x+(idx-2)*w, diffAcc[name], width=w, align='center', label = names[idx])
+    xlabs = ["Orig", "Blur5", "Blur10", "Blur15", "Blur20", "Dark1", "Dark2", "Dark3", "Bright1", "Bright2", "Bright3", "Bright4","Bright5","Bright6", "Bright7", "Occl5", "Occl10", "Occl15", "Occl20", "Ocll25"]
+    plt.xticks(ticks= x, labels = xlabs, size = 12)
+    plt.xlabel("Test Set", size = 20)
+    plt.ylabel("Accuracy difference", size = 20)
+    plt.axhline(y = 0.0018, color = 'b', label = 'Significance threshold')
+    plt.axhline(y = -0.0018, color = 'b')
+    plt.legend(prop={'size': 14})
+    fig = plt.gcf()
+    fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/AccuracyDifference.png", quality = 95, bbox_inches = 'tight')
+    plt.show()
 
-    print(accuracies)
 def plotPredFeat(df, feat, lab1, lab2, lab3, levels):
     '''Not currently called from plots.py. I used this initially  for one dataframe.
     You can use this to plot 3 features (e.g. Pred_Blurred_15_Label, Pred_Blurred_10_Label and Pred_Blurred_5_Label)
@@ -122,7 +151,7 @@ def plotPredFeat(df, feat, lab1, lab2, lab3, levels):
     plt.title("Class predictions for various {} levels.".format(feat), size = 14)
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
-    plt.legend(prop={'size': 14}, loc = 'center left', bbox_to_anchor=(1, 0.5), 
+    plt.legend(prop={'size': 14}, loc = 'center left', bbox_to_anchor=(1, 0.5),
         fancybox=True, shadow=True)
     fig = plt.gcf()
     # fig.savefig("C:/Users/alexm/Desktop/AnalysisFigsAugment/{}_predictions.png".format(feat), quality = 95, bbox_inches = 'tight')
