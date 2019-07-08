@@ -96,7 +96,7 @@ For GPU support, NVIDIA CUDA compatible graphic card is needed with proper drive
 For the training pipeline, the following configuration file fields can be modified:
 * "MODEL_TO_TRAIN": VGG16 - pretrained on ImageNet, CUSTOMVGG - pretrained VGG16 without fully-connected layers, DENSENET - pretrained on ImageNet
 * "TRAIN_TYPE": INITIAL_TRAINING - train on german training dataset, ADDEUR/ADDBLUR/ADDDARK, ADDLIGHT, ADDOCCL - train on german training dataset + additional data either european or european BLOD augmented, ADDALL - train on german training dataset + additional all randomly chosen BLOD data
-* "ADDITIONAL_TRAIN_FOLDER" -  European/European_blurred/European_dark, European_light, European_occluded to be modifed when "TRAIN_TYPE" is ADDEUR/ADDBLUR/ADDDARK, ADDLIGHT, ADDOCCL
+* "ADDITIONAL_TRAIN_FOLDER": European/European_blurred/European_dark, European_light, European_occluded to be modifed when "TRAIN_TYPE" is ADDEUR/ADDBLUR/ADDDARK, ADDLIGHT, ADDOCCL
 
 After setting the desired scenario, simply run `python train.py` from `dl_gts` enviroment.
 
