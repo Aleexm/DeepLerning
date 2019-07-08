@@ -1,6 +1,6 @@
 # Deep learning project "Srike with BLOD" :vertical_traffic_light:
 
-Code for Group 16 python implementation of "Strike with BLOD: Analyzing the impact of Blur, Lightness, Occlusion, andDarkness on traffic sign recognition performance of CNN networks" as part of CS4180 Deep Learning 2018-2019 :mortar_board:.
+Code for Group 16 python implementation of "Strike with BLOD: Analyzing the impact of Blur, Lightness, Occlusion, and Darkness on traffic sign recognition performance of CNN networks" as part of CS4180 Deep Learning 2018-2019 :mortar_board:.
 
 Team members:
 
@@ -11,6 +11,8 @@ Team members:
  * [Joram van der Sluis](https://github.com/joramvdsluis)
  
  ## Data :floppy_disk:
+ 
+ Due to the large size of our datasets, we did not upload the data on GitHub. The project structure enforces the data to be in a local Google Drive folder. The folder can be placed in the following accepted locations: `home_dir/Google Drive`, `home_dir/GoogleDrive`, `home_dir/Desktop/Google Drive`, `home_dir/Desktop/GoogleDrive`, `C:/Google Drive`, `C:/GoogleDrive`, `D:/Google Drive`, `D:/GoogleDrive`, where **home_dir** is the path to the user home directory. Inside the Google Drive folder, the application folder needs to be created 
  
  ## Project structure :open_file_folder:
  
