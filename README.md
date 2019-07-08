@@ -46,7 +46,7 @@ Team members:
 * `config.txt` - configuration file
 
 ### Additional folders
-* `layervis_results` - for storing feature maps figures
+* `layervis_results\` - for storing feature maps figures
 * `output\` - for storing results for each tested arhitecture with different training and testing data
 > :exclamation: For each tested scenario, we have log file from training, testing, filename list of wrongly classified images, confusion matrices in Bokeh, aggregated results, training and validation loss per epoch
 * `models\` - saved GPU trained models for each scenario
