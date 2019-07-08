@@ -92,3 +92,19 @@ Inside that environment some addition packages needs to be installed. Run the fo
 For GPU support, NVIDIA CUDA compatible graphic card is needed with proper drivers installed.
 
 ## Usage :arrow_forward:
+
+For the training pipeline, the following configuration file fields can be modified:
+* "MODEL_TO_TRAIN": VGG16 - pretrained on ImageNet, CUSTOMVGG - pretrained VGG16 without fully-connected layers, DENSENET - pretrained on ImageNet
+* "TRAIN_TYPE": INITIAL_TRAINING - train on german training dataset, ADDEUR/ADDBLUR/ADDDARK, ADDLIGHT, ADDOCCL - train on german training dataset + additional data either european or european BLOD augmented, ADDALL - train on german training dataset + additional all randomly chosen BLOD data
+* "ADDITIONAL_TRAIN_FOLDER" -  European/European_blurred/European_dark, European_light, European_occluded to be modifed when "TRAIN_TYPE" is ADDEUR/ADDBLUR/ADDDARK, ADDLIGHT, ADDOCCL
+
+After setting the desired scenario, simply run `python train.py` from `dl_gts` enviroment.
+
+For the testing pipeline, the following configuration file fields can be modified:
+* `TRAINED_MODEL`: the saved trained model from `models/` folder for which the results are generated
+* `RESULTS_FILE`: the aggregated results file generated after running `python test.py` used for creating the confusion matrices
+
+After setting the desired scenario, simply run from `dl_gts` enviroment `python test.py` for running predictions on all testing datasets and `python plot_utils.py` for generating Bokeh confusion matrices after the aggregated results file was created from running the predictions.
+
+
+
