@@ -22,6 +22,7 @@ Team members:
  
  * `model_trainer.py` - implementation of the training pipeline class
  * `train.py` - main file for running a training session with the parameters read from configuration file
+ * `image_dataset.py` - pytorch Dataset class implementation for loading and processing our images
 
 ### Testing
 
@@ -31,8 +32,23 @@ Team members:
 * `layervis_utils.py` - utils functions for feature map visualization inspired by [here](https://github.com/utkuozbulak/pytorch-cnn-visualizations)
 * `layer_visualization.py` - main file for creating feature maps visusalization and saving them to `layervis_results` folder
 
+### Analysis
+
+* `analysisPlotFunctions.py` - implementation of all analysis plot functions
+* `analysis.py` - main file for calling analysis plot functions to plot class accuracy, predictions a.s.o
+
+### Others
+* `logger.py` -  logging system for generating folders initial structure and saving application logs to HTML files
+* `config.txt` - configuration file
+
+### Additional folders
+* `layervis_results` - for storing feature maps figures
+* `output\` - for storing results for each tested arhitecture with different training and testing data
+> :exclamation: For each tested scenario, we have log file from training, testing, filename list of wrongly classified images, confusion matrices in Bokeh, aggregated results, training and validation loss per epoch
+* `models\` - saved trained models for each scenario
+> :exclamation: Not included on GitHub due to space limitation
  
- ## Config file :bookmark_tabs:
+## Config file :bookmark_tabs:
  
  ```
 {
