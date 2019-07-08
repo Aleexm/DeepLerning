@@ -1,4 +1,4 @@
-# Deep learning project "Srike with BLOD" :vertical_traffic_light:
+# Deep learning project "Strike with BLOD" :vertical_traffic_light:
 
 Code for Group 16 python implementation of "Strike with BLOD: Analyzing the impact of **B**lur, **L**ightness, **O**cclusion, and **D**arkness on traffic sign recognition performance of CNN networks" as part of CS4180 Deep Learning 2018-2019 :mortar_board:.
 
