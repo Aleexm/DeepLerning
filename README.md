@@ -71,4 +71,14 @@ Team members:
 
 ## Installation :computer:
 
+The scripts can be run in [Anaconda](https://www.anaconda.com/download/) Windows/Linux environment.
+
+You need to create an Anaconda :snake: `python 3.6` environment named `dl_gts`.
+Inside that environment some addition packages needs to be installed. Run the following commands inside Anaconda Prompt ⌨:
+```shell
+(base) conda create -n dl_gts python=3.6 anaconda
+(base) conda activate dl_gts
+(dl_gts) conda install -c conda-forge pytorch
+```
+
 ## Usage :arrow_forward:
