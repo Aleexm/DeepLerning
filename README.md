@@ -101,8 +101,8 @@ For the training pipeline, the following configuration file fields can be modifi
 After setting the desired scenario, simply run `python train.py` from `dl_gts` enviroment.
 
 For the testing pipeline, the following configuration file fields can be modified:
-* `TRAINED_MODEL`: the saved trained model from `models/` folder for which the results are generated
-* `RESULTS_FILE`: the aggregated results file generated after running `python test.py` used for creating the confusion matrices
+* "TRAINED_MODEL": the saved trained model from `models/` folder for which the results are generated
+* "RESULTS_FILE": the aggregated results file generated after running `python test.py` used for creating the confusion matrices
 
 After setting the desired scenario, simply run from `dl_gts` enviroment `python test.py` for running predictions on all testing datasets and `python plot_utils.py` for generating Bokeh confusion matrices after the aggregated results file was created from running the predictions.
 
