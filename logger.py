@@ -2,10 +2,30 @@ from datetime import datetime as dt
 import sys
 import os
 import json
-
-from utils import get_drive_path
-
 import torch
+
+def get_drive_path():
+
+  home_dir = os.path.expanduser("~")
+  valid_paths = [
+                 os.path.join(home_dir, "Google Drive"),
+                 os.path.join(home_dir, "GoogleDrive"),
+                 os.path.join(os.path.join(home_dir, "Desktop"), "Google Drive"),
+                 os.path.join(os.path.join(home_dir, "Desktop"), "GoogleDrive"),
+                 os.path.join("C:", os.sep, "GoogleDrive"),
+                 os.path.join("C:", os.sep, "Google Drive"),
+                 os.path.join("D:", os.sep, "GoogleDrive"),
+                 os.path.join("D:", os.sep, "Google Drive"),
+                 ]
+
+  drive_path = None
+  for path in valid_paths:
+    if os.path.isdir(path):
+      drive_path = path
+      break
+
+  return drive_path
+
 
 _HTML_START = "<HEAD><meta http-equiv='refresh' content='100' ></HEAD><BODY><pre>"
 _HTML_END = "</pre></BODY>"
