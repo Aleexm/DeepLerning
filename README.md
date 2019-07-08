@@ -1,6 +1,6 @@
 # Deep learning project "Srike with BLOD" :vertical_traffic_light:
 
-Code for Group 16 python implementation of "Strike with BLOD: Analyzing the impact of Blur, Lightness, Occlusion, and Darkness on traffic sign recognition performance of CNN networks" as part of CS4180 Deep Learning 2018-2019 :mortar_board:.
+Code for Group 16 python implementation of "Strike with BLOD: Analyzing the impact of **B**lur, **L**ightness, **O**cclusion, and **D**arkness on traffic sign recognition performance of CNN networks" as part of CS4180 Deep Learning 2018-2019 :mortar_board:.
 
 Team members:
 
@@ -36,6 +36,10 @@ Team members:
 
 * `analysisPlotFunctions.py` - implementation of all analysis plot functions
 * `analysis.py` - main file for calling analysis plot functions to plot class accuracy, predictions a.s.o
+
+### Data augmentation
+
+* `Image-augmentation.py` - contains functions to load images, augment them with BLOD, and saves them seperately.
 
 ### Others
 * `logger.py` -  logging system for generating folders initial structure and saving application logs to HTML files
