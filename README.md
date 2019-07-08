@@ -45,7 +45,7 @@ Team members:
 * `layervis_results` - for storing feature maps figures
 * `output\` - for storing results for each tested arhitecture with different training and testing data
 > :exclamation: For each tested scenario, we have log file from training, testing, filename list of wrongly classified images, confusion matrices in Bokeh, aggregated results, training and validation loss per epoch
-* `models\` - saved trained models for each scenario
+* `models\` - saved GPU trained models for each scenario
 > :exclamation: Not included on GitHub due to space limitation
  
 ## Config file :bookmark_tabs:
@@ -78,7 +78,13 @@ Inside that environment some addition packages needs to be installed. Run the fo
 ```shell
 (base) conda create -n dl_gts python=3.6 anaconda
 (base) conda activate dl_gts
-(dl_gts) conda install -c conda-forge pytorch
+(dl_gts) conda install -c pytorch pytorch
+(dl_gts) conda install -c pytorch torchvision
+(dl_gts) conda install -c anaconda cudatoolkit
+(dl_gts) conda install -c conda-forge tqdm 
+(dl_gts) conda install -c conda-forge opencv
 ```
+
+For GPU support, NVIDIA CUDA compatible graphic card is needed with proper drivers installed.
 
 ## Usage :arrow_forward:
