@@ -12,9 +12,25 @@ Team members:
  
  ## Data :floppy_disk:
  
- Due to the large size of our datasets, we did not upload the data on GitHub. The project structure enforces the data to be in a local Google Drive folder. The folder can be placed in the following accepted locations: `home_dir/Google Drive`, `home_dir/GoogleDrive`, `home_dir/Desktop/Google Drive`, `home_dir/Desktop/GoogleDrive`, `C:/Google Drive`, `C:/GoogleDrive`, `D:/Google Drive`, `D:/GoogleDrive`, where **home_dir** is the path to the user home directory. Inside the Google Drive folder, the application folder needs to be created 
+ Due to the large size of our datasets, we did not upload the data on GitHub. The project structure enforces the data to be in a local Google Drive folder. The folder can be placed in the following accepted locations: `home_dir/Google Drive`, `home_dir/GoogleDrive`, `home_dir/Desktop/Google Drive`, `home_dir/Desktop/GoogleDrive`, `C:/Google Drive`, `C:/GoogleDrive`, `D:/Google Drive`, `D:/GoogleDrive`, where **home_dir** is the path to the user home directory. Inside the Google Drive folder, the application folder needs to be created, `Deep-Learning-Team16`. The data archieve can be downloaded from this [link](https://drive.google.com/file/d/18ZK4E9jfKA8pvgsDfyMq0CiOxbw7Iq9B/view?usp=sharing). Unzip the downloaded archieve and place it in the newly created application folder, `google_drive_path/Deep-Learning-Team16/`.
  
  ## Project structure :open_file_folder:
+ 
+ The structure of the project is presented per tasks:
+ 
+ ### Training
+ 
+ * `model_trainer.py` - implementation of the training pipeline class
+ * `train.py` - main file for running a training session with the parameters read from configuration file
+
+### Testing
+
+* `model_tester.py` - implementation of the testing pipeline class
+* `test.py` - main file for running a testing session with the parameters read from configuration file
+* `plot_utils.py` - script for generating [Bokeh](https://bokeh.pydata.org/en/latest/) confusion matrices
+* `layervis_utils.py` - utils functions for feature map visualization inspired by [here](https://github.com/utkuozbulak/pytorch-cnn-visualizations)
+* `layer_visualization.py` - main file for creating feature maps visusalization and saving them to `layervis_results` folder
+
  
  ## Config file :bookmark_tabs:
  
